@@ -20,7 +20,7 @@ pub fn spawn_player(
 
     commands.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.width() / 2.0, 0.0),
+            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
             texture: assets_server.load("sprites/ball_blue_large.png"),
             ..default()
         },
@@ -32,7 +32,7 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     let window = window_query.get_single().unwrap();
 
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.width() / 2.0, 100.0),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 100.0),
         ..default()
     });
 }

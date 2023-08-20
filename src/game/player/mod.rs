@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::game::SimulationState;
+use crate::AppState;
 use systems::*;
 
 mod components;
@@ -12,7 +14,7 @@ struct MovementSystemSet;
 struct ConfinementSystemSet;
 
 // --- Note ---
-// Optionally we can use enum variants and pass them insted of struct names
+// Optionally we can use enum variants and pass them instead of struct names
 // #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 // struct PlayerSystemSet {
 //     Movement,
@@ -28,7 +30,7 @@ impl Plugin for PlayerPlugin {
         // and schedule by sets
         // For details see https://bevyengine.org/learn/migration-guides/0.10-0.11/#schedule-first-the-new-and-improved-add-systems
         app.configure_set(Update, ConfinementSystemSet.after(MovementSystemSet))
-            .add_systems(Startup, spawn_player)
+            .add_systems(OnEnter(AppState::Game), spawn_player)
             .add_systems(
                 Update,
                 (
@@ -40,7 +42,10 @@ impl Plugin for PlayerPlugin {
                     // confine_player_movement.after(player_movement),
                     enemy_hit_player,
                     player_hit_star,
-                ),
-            );
+                )
+                    .run_if(in_state(AppState::Game))
+                    .run_if(in_state(SimulationState::Running)),
+            )
+            .add_systems(OnExit(AppState::Game), despawn_player);
     }
 }

@@ -1,31 +1,28 @@
 use bevy::prelude::*;
 
-use crate::enemy::EnemyPlugin;
-use crate::events::GameOver;
-use crate::player::PlayerPlugin;
-use crate::score::ScorePlugin;
-use crate::star::StarPlugin;
-use crate::systems::exit_game;
-use systems::*;
+use crate::game::GamePlugin;
+use crate::main_menu::MainMenuPlugin;
+use systems::{transition_to_game_state, transition_to_main_menu_state};
 
-mod enemy;
-mod events;
-mod player;
-mod score;
-mod star;
+mod game;
+mod main_menu;
 mod systems;
 
 fn main() {
     App::new()
-        .add_plugins((
-            DefaultPlugins,
-            EnemyPlugin,
-            PlayerPlugin,
-            ScorePlugin,
-            StarPlugin,
-        ))
-        .add_event::<GameOver>()
-        .add_systems(Startup, spawn_camera)
-        .add_systems(Update, (exit_game, handle_game_over))
+        .add_plugins((DefaultPlugins, GamePlugin, MainMenuPlugin))
+        .add_state::<AppState>()
+        .add_systems(
+            Update,
+            (transition_to_game_state, transition_to_main_menu_state),
+        )
         .run();
+}
+
+#[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    Game,
+    GameOver,
 }

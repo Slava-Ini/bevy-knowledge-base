@@ -7,7 +7,7 @@ use events::GameOver;
 use player::PlayerPlugin;
 use score::ScorePlugin;
 use star::StarPlugin;
-use systems::{exit_game, handle_game_over, spawn_camera};
+use systems::*;
 
 use self::systems::toggle_simulation;
 
@@ -24,6 +24,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<GameOver>()
             .add_state::<SimulationState>()
+            .add_systems(OnEnter(AppState::Game), pause_simulation)
             .add_plugins((EnemyPlugin, PlayerPlugin, ScorePlugin, StarPlugin))
             .add_systems(Startup, spawn_camera)
             .add_systems(
@@ -33,7 +34,8 @@ impl Plugin for GamePlugin {
                     handle_game_over,
                     toggle_simulation.run_if(in_state(AppState::Game)),
                 ),
-            );
+            )
+            .add_systems(OnExit(AppState::Game), resume_simulation);
     }
 }
 

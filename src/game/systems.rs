@@ -7,19 +7,29 @@ use super::SimulationState;
 use crate::game::GameOver;
 use crate::AppState;
 
+pub fn pause_simulation(mut simulation_next_state: ResMut<NextState<SimulationState>>) {
+    simulation_next_state.set(SimulationState::Paused);
+    println!("Pausing simulation");
+}
+
+pub fn resume_simulation(mut simulation_next_state: ResMut<NextState<SimulationState>>) {
+    simulation_next_state.set(SimulationState::Running);
+    println!("Resuming simulation");
+}
+
 pub fn toggle_simulation(
-    mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
     simulation_state: Res<State<SimulationState>>,
+    mut next_app_state: ResMut<NextState<SimulationState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         match simulation_state.get() {
             SimulationState::Running => {
-                commands.insert_resource(NextState(Some(SimulationState::Paused)));
+                next_app_state.set(SimulationState::Paused);
                 println!("Pausing simulation");
             }
             SimulationState::Paused => {
-                commands.insert_resource(NextState(Some(SimulationState::Running)));
+                next_app_state.set(SimulationState::Running);
                 println!("Resuming simulation");
             }
         }
@@ -46,9 +56,12 @@ pub fn exit_game(
     }
 }
 
-pub fn handle_game_over(mut commands: Commands, mut game_over_event_reader: EventReader<GameOver>) {
+pub fn handle_game_over(
+    mut game_over_event_reader: EventReader<GameOver>,
+    mut next_app_state: ResMut<NextState<AppState>>,
+) {
     for event in game_over_event_reader.iter() {
         println!("Game Over! Final Score: {}", event.score);
-        commands.insert_resource(NextState(Some(AppState::GameOver)));
+        next_app_state.set(AppState::GameOver);
     }
 }

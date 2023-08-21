@@ -17,22 +17,47 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
     let main_menu_entity = commands
         .spawn((
             NodeBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Column,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    column_gap: Val::Px(8.0),
-                    ..default()
-                },
-                background_color: Color::RED.into(),
+                style: MAIN_MENU_STYLE,
                 ..default()
             },
             MainMenu,
         ))
         .with_children(|parent| {
             // === Title ===
+            parent
+                .spawn((
+                    NodeBundle {
+                        style: TITLE_STYLE,
+                        ..default()
+                    },
+                    PlayButton,
+                ))
+                .with_children(|parent| {
+                    // == Image 1 ==
+                    parent.spawn(ImageBundle {
+                        style: IMAGE_STYLE,
+                        image: asset_server.load("sprites/ball_blue_large.png").into(),
+                        ..default()
+                    });
+                    // == Text ==
+                    parent.spawn(TextBundle {
+                        text: Text {
+                            sections: vec![TextSection::new(
+                                "Bevy Ball Game",
+                                get_title_text_style(asset_server),
+                            )],
+                            alignment: TextAlignment::Center,
+                            ..default()
+                        },
+                        ..default()
+                    });
+                    // == Image 2 ==
+                    parent.spawn(ImageBundle {
+                        style: IMAGE_STYLE,
+                        image: asset_server.load("sprites/ball_red_large.png").into(),
+                        ..default()
+                    });
+                });
             // === Play Button ===
             parent
                 .spawn((
@@ -42,27 +67,45 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                         ..default()
                     },
                     PlayButton,
-                ));
-                // TODO: start here
-                // .with_children(|parent| {
-                //     parent.spawn(TextBundle {
-                //         text: Text {
-                //             sections: vec![
-                //                 TextSection::new(
-                //                     "Play",
-                //                     TextStyle {
-                //                         font
+                ))
+                .with_children(|parent| {
+                    parent.spawn(TextBundle {
+                        text: Text {
+                            sections: vec![TextSection::new(
+                                "Play",
+                                get_button_text_style(asset_server),
+                            )],
+                            alignment: TextAlignment::Center,
+                            ..default()
+                        },
 
-                //                     }
-
-                //                 ) ,
-                //             ]
-
-                //         }
-
-                //         ,..default() });
-                // });
+                        ..default()
+                    });
+                });
             // === Quit Button ===
+            parent
+                .spawn((
+                    ButtonBundle {
+                        style: BUTTON_STYLE,
+                        background_color: NORMAL_BUTTON_COLOR.into(),
+                        ..default()
+                    },
+                    QuitButton,
+                ))
+                .with_children(|parent| {
+                    parent.spawn(TextBundle {
+                        text: Text {
+                            sections: vec![TextSection::new(
+                                "Quit",
+                                get_button_text_style(asset_server),
+                            )],
+                            alignment: TextAlignment::Center,
+                            ..default()
+                        },
+
+                        ..default()
+                    });
+                });
         })
         .id();
 
